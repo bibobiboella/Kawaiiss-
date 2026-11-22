@@ -173,6 +173,7 @@
       const fullscreenButton = document.getElementById("fullscreen");
       let previousVersion = "";
       let requestInProgress = false;
+      const viewerOrigin = "https://embed.diagrams.net";
 
       if (location.protocol === "file:") {
         viewer.hidden = true;
@@ -185,16 +186,50 @@
 
       const diagramUrl = new URL(diagramPath, location.href);
 
+      async function loadDiagramIntoViewer() {
+        const response = await fetch(diagramUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const documentXml = new DOMParser().parseFromString(await response.text(), "application/xml");
+        const graphModel = documentXml.querySelector("mxGraphModel");
+        if (!graphModel) throw new Error("族谱文件缺少 mxGraphModel");
+        viewer.contentWindow.postMessage(JSON.stringify({
+          action: "load",
+          xml: new XMLSerializer().serializeToString(graphModel)
+        }), viewerOrigin);
+      }
+
+      window.addEventListener("message", event => {
+        if (event.origin !== viewerOrigin || event.source !== viewer.contentWindow) return;
+        let data;
+        try {
+          data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        } catch {
+          return;
+        }
+
+        if (data.event === "init") {
+          loadDiagramIntoViewer().catch(() => {
+            status.textContent = "无法加载族谱文件，请点击刷新重试";
+          });
+        } else if (data.event === "openLink" && typeof data.link === "string") {
+          const target = new URL(data.link, location.href);
+          if (target.origin === location.origin && target.pathname.endsWith("/album.html")) {
+            location.assign(target.href);
+          }
+        }
+      });
+
       function showDiagram(version) {
-        const source = new URL(diagramUrl);
-        source.searchParams.set("_refresh", version || Date.now().toString());
         const params = new URLSearchParams({
-          lightbox: "1",
-          layers: "1",
-          nav: "1",
-          url: source.href
+          embed: "1",
+          proto: "json",
+          spin: "1",
+          ui: "min",
+          noSaveBtn: "1",
+          noExitBtn: "1",
+          suppressNewWindows: "1"
         });
-        viewer.src = `https://viewer.diagrams.net/?${params.toString()}`;
+        viewer.src = `${viewerOrigin}/?${params.toString()}`;
         status.textContent = "在线查看 · 打开或点击刷新时更新";
       }
 
