@@ -13,6 +13,27 @@
       { "src": "./相册/Eric/eric.jpg", "caption": "族谱头像" }
     ]
   },
+  "milan": {
+    "name": "米兰",
+    "role": "种公 · 现役",
+    "photos": [
+      { "src": "./相册/米兰/米兰.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "juanjuan": {
+    "name": "卷卷",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./相册/卷卷/卷卷.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "luna": {
+    "name": "露娜",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./相册/露娜/露娜.jpg", "caption": "族谱头像" }
+    ]
+  },
   "xixi": {
     "name": "溪溪",
     "role": "种母 · 现役",
