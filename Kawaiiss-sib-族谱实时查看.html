@@ -351,11 +351,15 @@
       function showDiagram(version) {
         const source = new URL(diagramUrl);
         source.searchParams.set("_refresh", version || Date.now().toString());
+        const border = window.matchMedia("(max-width: 600px), (pointer: coarse)").matches
+          ? "15"
+          : "60";
         const params = new URLSearchParams({
           lightbox: "1",
           layers: "1",
           nav: "1",
           links: "1",
+          border,
           url: source.href
         });
         viewer.src = `https://viewer.diagrams.net/?${params.toString()}`;
