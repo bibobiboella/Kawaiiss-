@@ -144,7 +144,9 @@
           nameHeading.textContent = `${album.name}的相册`;
           meta.textContent = `${album.role} · 共 ${album.photos.length} 张照片`;
           notice.textContent = album.photos.length === 1
-            ? "目前先收录了这只猫的头像照片。后续把照片放入对应相册并更新 albums.json，就会显示在这里。"
+            ? album.role.includes("后代")
+              ? `目前先收录了${album.name}的照片。后续添加更多照片并更新 albums.json，就会显示在这里。`
+              : "目前先收录了这只猫的头像照片。后续把照片放入对应相册并更新 albums.json，就会显示在这里。"
             : "点击照片可查看大图。";
 
           album.photos.forEach((photo, index) => {
