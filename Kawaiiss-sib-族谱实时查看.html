@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Kawaiiss-sib 大家族族谱</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #233044;
+      background: #f4f7fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; min-height: 100vh; }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e5eaf1;
+    }
+
+    h1 { margin: 0; font-size: 18px; font-weight: 650; }
+
+    .actions { display: flex; align-items: center; gap: 12px; }
+
+    button, .download {
+      border: 1px solid #d5deea;
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #334155;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button:hover, .download:hover { background: #f7f9fc; }
+
+    #status {
+      color: #64748b;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    main { height: calc(100vh - 57px); min-height: 420px; }
+
+    #viewer { width: 100%; height: 100%; border: 0; background: #fff; }
+
+    #message {
+      display: none;
+      max-width: 680px;
+      margin: 12vh auto;
+      padding: 28px;
+      border: 1px solid #e5eaf1;
+      border-radius: 14px;
+      background: #fff;
+      line-height: 1.7;
+    }
+
+    #message h2 { margin-top: 0; font-size: 18px; }
+    #message p { color: #526174; }
+
+    @media (max-width: 600px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .actions { width: 100%; flex-wrap: wrap; }
+      main { height: calc(100vh - 102px); }
+      #status { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kawaiiss-sib 大家族族谱</h1>
+    <div class="actions">
+      <span id="status" role="status">正在连接族谱…</span>
+      <button id="refresh" type="button">刷新</button>
+      <a class="download" href="./Kawaiiss-sib-大家族族谱.drawio" download>下载 draw.io 文件</a>
+    </div>
+  </header>
+  <main>
+    <iframe id="viewer" title="Kawaiiss-sib 大家族族谱" allowfullscreen></iframe>
+    <section id="message">
+      <h2>这是族谱的在线查看页面</h2>
+      <p>请将本 HTML 文件和 <strong>Kawaiiss-sib-大家族族谱.drawio</strong> 一起发布到网站的同一目录（例如 GitHub Pages）。页面会读取同目录的族谱文件，并定时检查更新。</p>
+      <p>仅从电脑直接打开这个 HTML 文件时，浏览器会阻止它读取旁边的文件。发布到网站后，其他人就可以通过网页链接查看。</p>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const diagramPath = "./Kawaiiss-sib-大家族族谱.drawio";
+      const status = document.getElementById("status");
+      const viewer = document.getElementById("viewer");
+      const message = document.getElementById("message");
+      const refreshButton = document.getElementById("refresh");
+      let previousVersion = "";
+      let requestInProgress = false;
+
+      if (location.protocol === "file:") {
+        viewer.hidden = true;
+        message.style.display = "block";
+        status.textContent = "尚未发布到网站";
+        refreshButton.disabled = true;
+        return;
+      }
+
+      const diagramUrl = new URL(diagramPath, location.href);
+
+      function showDiagram(version) {
+        const source = new URL(diagramUrl);
+        source.searchParams.set("_refresh", version || Date.now().toString());
+        const params = new URLSearchParams({
+          lightbox: "1",
+          layers: "1",
+          nav: "1",
+          url: source.href
+        });
+        viewer.src = `https://viewer.diagrams.net/?${params.toString()}`;
+        status.textContent = "在线查看 · 自动检查更新中";
+      }
+
+      async function checkForUpdate(force = false) {
+        if (requestInProgress) return;
+        requestInProgress = true;
+        try {
+          const response = await fetch(diagramUrl, {
+            method: "HEAD",
+            cache: "no-store"
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const version = response.headers.get("etag")
+            || response.headers.get("last-modified")
+            || response.headers.get("content-length")
+            || "available";
+          if (force || version !== previousVersion) {
+            previousVersion = version;
+            showDiagram(version);
+          }
+        } catch {
+          status.textContent = "暂时无法读取族谱文件；请确认 HTML 和 draw.io 文件已一起发布";
+        } finally {
+          requestInProgress = false;
+        }
+      }
+
+      refreshButton.addEventListener("click", () => checkForUpdate(true));
+      checkForUpdate(true);
+      window.setInterval(() => checkForUpdate(), 15000);
+    })();
+  </script>
+</body>
+</html>
