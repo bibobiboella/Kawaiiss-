@@ -1,0 +1,58 @@
+{
+  "kaka": {
+    "name": "咔咔",
+    "role": "种公 · 现役",
+    "photos": [
+      { "src": "./photos/kaka.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "eric": {
+    "name": "Eric",
+    "role": "种公 · 现役",
+    "photos": [
+      { "src": "./photos/eric.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "xixi": {
+    "name": "溪溪",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./photos/xixi.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "youyou": {
+    "name": "悠悠",
+    "role": "种母 · 退役",
+    "photos": [
+      { "src": "./photos/youyou.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "jiumi": {
+    "name": "啾咪",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./photos/jiumi.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "duoduo": {
+    "name": "朵朵",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./photos/duoduo.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "tangtang": {
+    "name": "糖糖（焦糖）",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./photos/tangtang.jpg", "caption": "族谱头像" }
+    ]
+  },
+  "nana": {
+    "name": "娜娜",
+    "role": "种母 · 退役",
+    "photos": [
+      { "src": "./photos/nana.jpg", "caption": "族谱头像" }
+    ]
+  }
+}

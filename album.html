@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>猫咪相册 · Kawaiiss-sib</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: #233044;
+      background: #f4f7fb;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px max(16px, calc((100vw - 1100px) / 2));
+      background: #fff;
+      border-bottom: 1px solid #e5eaf1;
+    }
+
+    header a, .back {
+      color: #315a91;
+      text-decoration: none;
+    }
+
+    header a { font-size: 14px; }
+    main { width: min(1100px, 100%); margin: 0 auto; padding: 28px 20px 48px; }
+    .intro { margin-bottom: 22px; }
+    h1 { margin: 0 0 6px; font-size: clamp(24px, 5vw, 34px); }
+    .meta { margin: 0; color: #64748b; font-size: 14px; }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+      gap: 16px;
+    }
+
+    figure {
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid #e5eaf1;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 4px 16px rgb(35 48 68 / 6%);
+    }
+
+    figure button {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: #eef2f7;
+      cursor: zoom-in;
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    figcaption { padding: 10px 12px; color: #64748b; font-size: 13px; }
+    #notice { margin: 20px 0 0; color: #64748b; font-size: 13px; line-height: 1.6; }
+    #error { display: none; padding: 18px; border-radius: 12px; background: #fff; color: #526174; }
+
+    dialog {
+      width: min(96vw, 1200px);
+      max-width: none;
+      max-height: 94vh;
+      padding: 12px;
+      border: 0;
+      border-radius: 14px;
+      background: #111827;
+      color: #fff;
+    }
+
+    dialog::backdrop { background: rgb(15 23 42 / 82%); }
+    dialog img { display: block; max-width: 100%; max-height: 82vh; margin: auto; object-fit: contain; }
+    dialog form { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+    dialog button { padding: 8px 12px; border: 1px solid #64748b; border-radius: 8px; color: #fff; background: #1e293b; }
+
+    @media (max-width: 600px) {
+      header { padding: calc(10px + env(safe-area-inset-top)) 14px 10px; }
+      main { padding: 22px 14px calc(28px + env(safe-area-inset-bottom)); }
+      .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      figure { border-radius: 10px; }
+      figure img { height: clamp(150px, 54vw, 250px); }
+      figcaption { padding: 8px 9px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="./Kawaiiss-sib-族谱实时查看.html">← 返回族谱</a>
+    <a href="./">Kawaiiss-sib</a>
+  </header>
+  <main>
+    <section class="intro">
+      <h1 id="name">猫咪相册</h1>
+      <p class="meta" id="meta">正在载入照片…</p>
+    </section>
+    <section class="gallery" id="gallery" aria-label="猫咪照片"></section>
+    <p id="notice"></p>
+    <p id="error" role="status">找不到这只猫的相册，请从族谱中的爸爸或妈妈头像进入。</p>
+  </main>
+  <dialog id="lightbox" aria-label="照片大图">
+    <form method="dialog"><button aria-label="关闭照片">关闭 ✕</button></form>
+    <img id="large-photo" alt="">
+  </dialog>
+  <script>
+    (() => {
+      const catId = new URLSearchParams(location.search).get("cat");
+      const nameHeading = document.getElementById("name");
+      const meta = document.getElementById("meta");
+      const gallery = document.getElementById("gallery");
+      const notice = document.getElementById("notice");
+      const error = document.getElementById("error");
+      const lightbox = document.getElementById("lightbox");
+      const largePhoto = document.getElementById("large-photo");
+
+      fetch("./albums.json", { cache: "no-store" })
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then(albums => {
+          const album = albums[catId];
+          if (!album || !Array.isArray(album.photos) || album.photos.length === 0) {
+            error.style.display = "block";
+            meta.textContent = "";
+            return;
+          }
+
+          document.title = `${album.name}的相册 · Kawaiiss-sib`;
+          nameHeading.textContent = `${album.name}的相册`;
+          meta.textContent = `${album.role} · 共 ${album.photos.length} 张照片`;
+          notice.textContent = album.photos.length === 1
+            ? "目前先收录了这只猫的头像照片。后续把照片放入对应相册并更新 albums.json，就会显示在这里。"
+            : "点击照片可查看大图。";
+
+          album.photos.forEach((photo, index) => {
+            const figure = document.createElement("figure");
+            const openButton = document.createElement("button");
+            const image = document.createElement("img");
+            const caption = document.createElement("figcaption");
+            image.src = photo.src;
+            image.alt = `${album.name}的照片 ${index + 1}`;
+            image.loading = "lazy";
+            openButton.type = "button";
+            openButton.setAttribute("aria-label", `查看${album.name}照片 ${index + 1}`);
+            openButton.addEventListener("click", () => {
+              largePhoto.src = photo.src;
+              largePhoto.alt = image.alt;
+              lightbox.showModal();
+            });
+            openButton.append(image);
+            caption.textContent = photo.caption || `照片 ${index + 1}`;
+            figure.append(openButton, caption);
+            gallery.append(figure);
+          });
+        })
+        .catch(() => {
+          meta.textContent = "";
+          error.textContent = "相册暂时无法载入，请稍后重试。";
+          error.style.display = "block";
+        });
+
+      lightbox.addEventListener("click", event => {
+        if (event.target === lightbox) lightbox.close();
+      });
+    })();
+  </script>
+</body>
+</html>
