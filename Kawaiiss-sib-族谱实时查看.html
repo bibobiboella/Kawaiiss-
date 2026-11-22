@@ -90,7 +90,7 @@
     <iframe id="viewer" title="Kawaiiss-sib 大家族族谱" allowfullscreen></iframe>
     <section id="message">
       <h2>这是族谱的在线查看页面</h2>
-      <p>请将本 HTML 文件和 <strong>Kawaiiss-sib-大家族族谱.drawio</strong> 一起发布到网站的同一目录（例如 GitHub Pages）。页面会读取同目录的族谱文件，并定时检查更新。</p>
+      <p>请将本 HTML 文件和 <strong>Kawaiiss-sib-大家族族谱.drawio</strong> 一起发布到网站的同一目录（例如 GitHub Pages）。页面会在打开或点击刷新时读取最新族谱。</p>
       <p>仅从电脑直接打开这个 HTML 文件时，浏览器会阻止它读取旁边的文件。发布到网站后，其他人就可以通过网页链接查看。</p>
     </section>
   </main>
@@ -124,7 +124,7 @@
           url: source.href
         });
         viewer.src = `https://viewer.diagrams.net/?${params.toString()}`;
-        status.textContent = "在线查看 · 自动检查更新中";
+        status.textContent = "在线查看 · 打开或点击刷新时更新";
       }
 
       async function checkForUpdate(force = false) {
@@ -153,7 +153,6 @@
 
       refreshButton.addEventListener("click", () => checkForUpdate(true));
       checkForUpdate(true);
-      window.setInterval(() => checkForUpdate(), 15000);
     })();
   </script>
 </body>
