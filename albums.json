@@ -3,49 +3,49 @@
     "name": "咔咔",
     "role": "种公 · 现役",
     "photos": [
-      { "src": "./头像/kaka.jpg", "caption": "族谱头像" }
+      { "src": "./相册/咔咔/kaka.jpg", "caption": "族谱头像" }
     ]
   },
   "eric": {
     "name": "Eric",
     "role": "种公 · 现役",
     "photos": [
-      { "src": "./头像/eric.jpg", "caption": "族谱头像" }
+      { "src": "./相册/Eric/eric.jpg", "caption": "族谱头像" }
     ]
   },
   "xixi": {
     "name": "溪溪",
     "role": "种母 · 现役",
     "photos": [
-      { "src": "./头像/xixi.jpg", "caption": "族谱头像" }
+      { "src": "./相册/溪溪/xixi.jpg", "caption": "族谱头像" }
     ]
   },
   "youyou": {
     "name": "悠悠",
     "role": "种母 · 退役",
     "photos": [
-      { "src": "./头像/youyou.jpg", "caption": "族谱头像" }
+      { "src": "./相册/悠悠/youyou.jpg", "caption": "族谱头像" }
     ]
   },
   "jiumi": {
     "name": "啾咪",
     "role": "种母 · 现役",
     "photos": [
-      { "src": "./头像/jiumi.jpg", "caption": "族谱头像" }
+      { "src": "./相册/啾咪/jiumi.jpg", "caption": "族谱头像" }
     ]
   },
   "duoduo": {
     "name": "朵朵",
     "role": "种母 · 现役",
     "photos": [
-      { "src": "./头像/duoduo.jpg", "caption": "族谱头像" }
+      { "src": "./相册/朵朵/duoduo.jpg", "caption": "族谱头像" }
     ]
   },
   "tangtang": {
     "name": "糖糖（焦糖）",
     "role": "种母 · 现役",
     "photos": [
-      { "src": "./头像/tangtang.jpg", "caption": "族谱头像" }
+      { "src": "./相册/糖糖/tangtang.jpg", "caption": "族谱头像" }
     ]
   },
   "blueberry": {
@@ -59,7 +59,7 @@
     "name": "娜娜",
     "role": "种母 · 退役",
     "photos": [
-      { "src": "./头像/nana.jpg", "caption": "族谱头像" }
+      { "src": "./相册/娜娜/nana.jpg", "caption": "族谱头像" }
     ]
   }
 }
