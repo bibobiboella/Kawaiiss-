@@ -48,6 +48,13 @@
       { "src": "./头像/tangtang.jpg", "caption": "族谱头像" }
     ]
   },
+  "blueberry": {
+    "name": "蓝莓",
+    "role": "种母 · 现役",
+    "photos": [
+      { "src": "./相册/蓝莓/蓝莓.jpg", "caption": "族谱头像" }
+    ]
+  },
   "nana": {
     "name": "娜娜",
     "role": "种母 · 退役",
