@@ -9,8 +9,12 @@
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
         "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      color: #233044;
-      background: #f4f7fb;
+      color: #704b60;
+      background: #fff3f8;
+      --pink: #e99ab8;
+      --deep-pink: #bd6f91;
+      --soft-pink: #fff8fb;
+      --lace: #f2c5d6;
     }
 
     * { box-sizing: border-box; }
@@ -23,20 +27,47 @@
       height: 100dvh;
       margin: 0;
       overflow: hidden;
+      background:
+        radial-gradient(ellipse at 10% 12%, #ffe1ed 0, transparent 26%),
+        radial-gradient(ellipse at 92% 78%, #f9e3f2 0, transparent 28%),
+        #fff8fb;
     }
 
     header {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       flex: none;
-      padding: 10px 20px;
-      background: #fff;
-      border-bottom: 1px solid #e5eaf1;
+      padding: 13px 22px 18px;
+      background: linear-gradient(110deg, #fffafd, #fff0f6 55%, #fffafd);
+      border-bottom: 1px solid #f4d8e4;
+      box-shadow: 0 4px 16px #b96c8812;
     }
 
-    h1 { margin: 0; font-size: 18px; font-weight: 650; }
+    header::after {
+      position: absolute;
+      right: 0;
+      bottom: -7px;
+      left: 0;
+      height: 14px;
+      background: radial-gradient(circle at 7px 0, transparent 6px, #fff8fb 6.5px) 0 0 / 14px 14px repeat-x;
+      content: "";
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0;
+      color: #a95278;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1px #fff, 0 2px 8px #eab3c966;
+    }
+
+    h1::before { content: "✦  "; color: #e7a5bf; }
+    h1::after { content: "  ✦"; color: #e7a5bf; }
 
     .actions { display: flex; align-items: center; gap: 8px; }
 
@@ -45,61 +76,146 @@
       align-items: center;
       justify-content: center;
       min-height: 40px;
-      border: 1px solid #d5deea;
-      border-radius: 8px;
+      border: 1px solid #edc4d4;
+      border-radius: 999px;
       padding: 8px 12px;
-      color: #334155;
-      background: #fff;
+      color: #925b74;
+      background: linear-gradient(#fff, #fff7fa);
       font: inherit;
       font-size: 13px;
       text-decoration: none;
       cursor: pointer;
+      box-shadow: 0 2px 5px #bc769015, inset 0 1px #fff;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
 
-    button:hover, .download:hover { background: #f7f9fc; }
+    button:hover, .download:hover {
+      transform: translateY(-1px);
+      background: #fff0f6;
+      box-shadow: 0 4px 10px #bc769028, inset 0 1px #fff;
+    }
     button:disabled { cursor: wait; opacity: 0.65; }
 
     #status {
-      color: #64748b;
+      color: #a4778c;
       font-size: 12px;
       white-space: nowrap;
     }
 
     #mobile-hint { display: none; }
 
+    #album-shortcuts {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: none;
+      overflow-x: auto;
+      padding: 12px 18px;
+      background:
+        radial-gradient(circle, #f3c7d7 1px, transparent 1.5px) 0 0 / 12px 12px,
+        linear-gradient(90deg, #fffafd, #fff4f8 50%, #fffafd);
+      border-bottom: 1px dashed #e9bfd0;
+      scrollbar-color: #e7b1c6 #fff3f8;
+      scrollbar-width: thin;
+    }
+
+    #album-shortcuts h2 {
+      flex: none;
+      margin: 0;
+      color: #a35f7d;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    #album-shortcuts h2::before { content: "♡ "; color: #dc8eac; }
+
+    #album-shortcuts nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .album-shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: none;
+      min-height: 40px;
+      padding: 3px 9px 3px 4px;
+      border: 1px solid #f0c9d8;
+      border-radius: 999px;
+      color: #85566d;
+      background: linear-gradient(145deg, #fff, #fff5f9);
+      font-size: 12px;
+      text-decoration: none;
+      box-shadow: 0 2px 7px #b96c8818, inset 0 1px #fff;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .album-shortcut:hover {
+      transform: translateY(-2px);
+      border-color: #df9db7;
+      background: #fff0f6;
+      box-shadow: 0 5px 12px #b96c8830, inset 0 1px #fff;
+    }
+
+    .album-shortcut img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #e7abc2, 0 1px 4px #a95f7a30;
+    }
+
     main {
       flex: 1;
       min-width: 0;
       min-height: 0;
-      background: #fff;
+      padding: 12px;
+      background: linear-gradient(135deg, #fff0f6, #fdeaf2 48%, #fff6fa);
     }
 
-    #viewer { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+    #viewer {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 2px solid #efc6d6;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 4px 18px #a95f7a18, inset 0 0 0 4px #fff8fb;
+    }
     main:fullscreen { width: 100vw; height: 100vh; height: 100dvh; }
+    main:fullscreen { padding: 0; }
+    main:fullscreen #viewer { border: 0; border-radius: 0; box-shadow: none; }
 
     #message {
       display: none;
       max-width: 680px;
       margin: 12vh auto;
       padding: 28px;
-      border: 1px solid #e5eaf1;
-      border-radius: 14px;
-      background: #fff;
+      border: 1px solid #efc6d6;
+      border-radius: 20px;
+      background: #fffafd;
+      box-shadow: 0 8px 28px #a95f7a1a;
       line-height: 1.7;
     }
 
-    #message h2 { margin-top: 0; font-size: 18px; }
-    #message p { color: #526174; }
+    #message h2 { margin-top: 0; color: #a95278; font-size: 18px; }
+    #message p { color: #806879; }
 
     @media (max-width: 600px) {
       header {
         align-items: stretch;
         flex-direction: column;
         gap: 8px;
-        padding: calc(9px + env(safe-area-inset-top)) 12px 9px;
+        padding: calc(9px + env(safe-area-inset-top)) 12px 15px;
       }
 
       h1 { font-size: 16px; }
+      h1::before { content: "✧ "; }
+      h1::after { content: " ✧"; }
 
       .actions {
         display: grid;
@@ -125,15 +241,25 @@
         display: block;
         margin: 0;
         padding: 7px 12px;
-        color: #526174;
-        background: #f4f7fb;
+        color: #9c7085;
+        background: #fff4f8;
         font-size: 12px;
         line-height: 1.4;
         text-align: center;
       }
 
+      #album-shortcuts {
+        gap: 8px;
+        padding: 9px 10px;
+      }
+
+      #album-shortcuts nav { gap: 6px; }
+      main { padding: 7px; }
+      #viewer { border-radius: 14px; }
+
       body:has(main:fullscreen) header,
-      body:has(main:fullscreen) #mobile-hint { display: none; }
+      body:has(main:fullscreen) #mobile-hint,
+      body:has(main:fullscreen) #album-shortcuts { display: none; }
     }
 
     @media (max-width: 600px) and (orientation: landscape) {
@@ -155,6 +281,10 @@
     </div>
   </header>
   <p id="mobile-hint">建议横屏查看；在族谱中可双指缩放和拖动</p>
+  <section id="album-shortcuts" aria-label="现役种猫相册快捷入口">
+    <h2>现役种猫 · 点击头像看相册</h2>
+    <nav aria-label="现役种猫相册"></nav>
+  </section>
   <main>
     <iframe id="viewer" title="Kawaiiss-sib 大家族族谱" allowfullscreen></iframe>
     <section id="message">
@@ -171,8 +301,35 @@
       const message = document.getElementById("message");
       const refreshButton = document.getElementById("refresh");
       const fullscreenButton = document.getElementById("fullscreen");
+      const albumNav = document.querySelector("#album-shortcuts nav");
       let previousVersion = "";
       let requestInProgress = false;
+
+      fetch("./albums.json", { cache: "no-store" })
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then(albums => {
+          Object.entries(albums)
+            .filter(([, album]) => album.role.includes("现役"))
+            .forEach(([id, album]) => {
+              const link = document.createElement("a");
+              link.className = "album-shortcut";
+              link.href = `./album.html?cat=${encodeURIComponent(id)}`;
+              link.setAttribute("aria-label", `打开${album.name}的相册`);
+
+              const image = document.createElement("img");
+              image.src = album.photos[0].src;
+              image.alt = "";
+              link.append(image, document.createTextNode(album.name));
+              albumNav.append(link);
+            });
+        })
+        .catch(error => {
+          console.error("加载现役种猫相册入口失败", error);
+          albumNav.textContent = "相册入口加载失败，请刷新页面";
+        });
 
       if (location.protocol === "file:") {
         viewer.hidden = true;
