@@ -182,7 +182,7 @@
       display: block;
       width: 100%;
       height: auto;
-      aspect-ratio: 1940 / 1680;
+      aspect-ratio: 1940 / 1900;
       border: 0;
       border-radius: 0;
       background: #fff;
@@ -310,6 +310,7 @@
       const albumNav = document.querySelector("#album-shortcuts nav");
       let previousVersion = "";
       let requestInProgress = false;
+      let pendingDiagramXML = "";
 
       fetch("./albums.json", { cache: "no-store" })
         .then(response => {
@@ -348,9 +349,134 @@
 
       const diagramUrl = new URL(diagramPath, location.href);
 
-      function showDiagram(version) {
+      function getCellGeometry(cell, cellsById, visited = new Set()) {
+        const id = cell.getAttribute("id");
+        if (id && visited.has(id)) return null;
+        if (id) visited.add(id);
+
+        const geometry = Array.from(cell.children).find(child => child.localName === "mxGeometry");
+        if (!geometry) return null;
+
+        let x = Number(geometry.getAttribute("x")) || 0;
+        let y = Number(geometry.getAttribute("y")) || 0;
+        const parent = cellsById.get(cell.getAttribute("parent"));
+        if (parent && parent.getAttribute("id") !== "1") {
+          const parentGeometry = getCellGeometry(parent, cellsById, visited);
+          if (parentGeometry) {
+            x += parentGeometry.x;
+            y += parentGeometry.y;
+          }
+        }
+
+        return {
+          x,
+          y,
+          width: Number(geometry.getAttribute("width")) || 0,
+          height: Number(geometry.getAttribute("height")) || 0
+        };
+      }
+
+      function addBirthdayCrowns(xml) {
+        const diagram = new DOMParser().parseFromString(xml, "application/xml");
+        if (diagram.querySelector("parsererror")) {
+          throw new Error("族谱文件不是有效的 XML");
+        }
+
+        const graph = diagram.querySelector("mxGraphModel");
+        const root = graph?.querySelector("root");
+        if (!root) throw new Error("族谱文件中没有可显示的图表");
+
+        const cells = Array.from(graph.getElementsByTagName("mxCell"));
+        const cellsById = new Map(cells.map(cell => [cell.getAttribute("id"), cell]));
+        const today = new Date();
+        const todayKey = `${today.getMonth() + 1}/${today.getDate()}`;
+        const datedCells = cells.filter(cell => {
+          const birthday = cell.getAttribute("value")?.match(/(?:19|20)\d{2}\/(\d{1,2})\/(\d{1,2})/);
+          return birthday && `${Number(birthday[1])}/${Number(birthday[2])}` === todayKey;
+        });
+
+        if (!datedCells.length) return { xml, names: [] };
+
+        const images = cells.filter(cell => {
+          if (cell.getAttribute("vertex") !== "1") return false;
+          const style = cell.getAttribute("style") || "";
+          return /(?:^|;)shape=image(?:;|$)/.test(style);
+        }).map(cell => ({
+          cell,
+          geometry: getCellGeometry(cell, cellsById)
+        })).filter(image => image.geometry);
+
+        const names = [];
+        for (const [index, cell] of datedCells.entries()) {
+          const label = new DOMParser()
+            .parseFromString(cell.getAttribute("value") || "", "text/html")
+            .body.textContent.trim();
+          const birthdayMatch = label.match(/((?:19|20)\d{2})\/(\d{1,2})\/(\d{1,2})/);
+          const geometry = getCellGeometry(cell, cellsById);
+          if (!birthdayMatch || !geometry) continue;
+
+          const nearestImage = images
+            .map(image => ({
+              ...image,
+              distance: Math.hypot(image.geometry.x - geometry.x, image.geometry.y - geometry.y)
+            }))
+            .sort((a, b) => a.distance - b.distance)[0];
+          const hasNearbyImage = nearestImage && nearestImage.distance <= 24;
+          const target = hasNearbyImage ? nearestImage.geometry : geometry;
+          const crown = diagram.createElement("mxCell");
+          crown.setAttribute("id", `birthday-crown-${index}-${cell.getAttribute("id") || "cat"}`);
+          crown.setAttribute("parent", "1");
+          crown.setAttribute("value", "👑");
+          crown.setAttribute("vertex", "1");
+          crown.setAttribute(
+            "style",
+            "text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;strokeColor=none;fillColor=none;fontSize=30;fontStyle=1;fontColor=#D49A28;"
+          );
+
+          const crownGeometry = diagram.createElement("mxGeometry");
+          crownGeometry.setAttribute("x", String(target.x + (hasNearbyImage ? target.width / 2 - 18 : geometry.width / 2 - 18)));
+          crownGeometry.setAttribute("y", String(target.y - 29));
+          crownGeometry.setAttribute("width", "36");
+          crownGeometry.setAttribute("height", "28");
+          crownGeometry.setAttribute("as", "geometry");
+          crown.append(crownGeometry);
+          root.append(crown);
+
+          const catName = label.slice(0, birthdayMatch.index).trim();
+          if (catName) names.push(catName);
+        }
+
+        return {
+          xml: new XMLSerializer().serializeToString(graph),
+          names
+        };
+      }
+
+      async function showDiagram(version) {
         const source = new URL(diagramUrl);
         source.searchParams.set("_refresh", version || Date.now().toString());
+        const response = await fetch(source, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const birthdayDiagram = addBirthdayCrowns(await response.text());
+
+        if (birthdayDiagram.names.length) {
+          pendingDiagramXML = birthdayDiagram.xml;
+          const params = new URLSearchParams({
+            embed: "1",
+            proto: "json",
+            spin: "1",
+            noSaveBtn: "1",
+            noExitBtn: "1",
+            chrome: "0",
+            ui: "min",
+            refresh: Date.now().toString()
+          });
+          viewer.src = `https://embed.diagrams.net/?${params.toString()}`;
+          status.textContent = `在线查看 · 今天是${birthdayDiagram.names.join("、")}的生日`;
+          return;
+        }
+
+        pendingDiagramXML = "";
         const border = window.matchMedia("(max-width: 600px), (pointer: coarse)").matches
           ? "15"
           : "60";
@@ -365,6 +491,22 @@
         viewer.src = `https://viewer.diagrams.net/?${params.toString()}`;
         status.textContent = "在线查看 · 打开或点击刷新时更新";
       }
+
+      window.addEventListener("message", event => {
+        if (event.origin !== "https://embed.diagrams.net" || event.source !== viewer.contentWindow) return;
+        let data;
+        try {
+          data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        } catch {
+          return;
+        }
+        if (data?.event === "init" && pendingDiagramXML) {
+          viewer.contentWindow.postMessage(
+            JSON.stringify({ action: "load", xml: pendingDiagramXML }),
+            event.origin
+          );
+        }
+      });
 
       async function checkForUpdate(force = false) {
         if (requestInProgress) return;
@@ -382,9 +524,10 @@
             || "available";
           if (force || version !== previousVersion) {
             previousVersion = version;
-            showDiagram(version);
+            await showDiagram(version);
           }
-        } catch {
+        } catch (error) {
+          console.error("加载族谱失败", error);
           status.textContent = "暂时无法读取族谱文件；请确认 HTML 和 draw.io 文件已一起发布";
         } finally {
           requestInProgress = false;
