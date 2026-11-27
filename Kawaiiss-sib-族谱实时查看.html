@@ -454,7 +454,8 @@
 
       async function showDiagram(version) {
         const source = new URL(diagramUrl);
-        source.searchParams.set("_refresh", version || Date.now().toString());
+        #source.searchParams.set("_refresh", version || Date.now().toString());
+        source.searchParams.set("_refresh", Date.now().toString());
         const response = await fetch(source, { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const birthdayDiagram = addBirthdayCrowns(await response.text());
